@@ -1,13 +1,15 @@
-package felix.com.weatherapp;
+package felix.com.weatherapp.weather;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+import felix.com.weatherapp.R;
+
 /**
  * Created by fsoewito on 11/6/2015.
  */
-public class CurrentWeather {
+public class Current {
     public static final int CELSIUS = 0;
     public static final int FAHRENHEIT = 1;
 

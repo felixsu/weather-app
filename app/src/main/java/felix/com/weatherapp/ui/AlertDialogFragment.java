@@ -1,9 +1,11 @@
-package felix.com.weatherapp;
+package felix.com.weatherapp.ui;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.os.Bundle;
+
+import felix.com.weatherapp.R;
 
 /**
  * Created by felix on 11/5/2015.
