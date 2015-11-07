@@ -3,4 +3,11 @@
     <string name="action_settings">Settings</string>
     <string name="error_title">Oops, Sorry!</string>
     <string name="error_message">There\'s an error, please try again.</string>
+    <string name="label_humidity">humidity</string>
+    <string name="label_precipitation">rain</string>
+    <string name="label_time">Time</string>
+    <string name="dash_dash">--</string>
+    <string name="summary_label">getting weather...</string>
+    <string name="describer_icon">current weather</string>
+    <string name="describer_degree">degree icon</string>
 </resources>

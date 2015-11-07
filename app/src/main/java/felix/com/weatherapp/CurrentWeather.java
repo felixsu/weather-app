@@ -8,6 +8,9 @@ import java.util.TimeZone;
  * Created by fsoewito on 11/6/2015.
  */
 public class CurrentWeather {
+    public static final int CELSIUS = 0;
+    public static final int FAHRENHEIT = 1;
+
     private String mIcon;
     private long mTime;
     private double mTemperature;
@@ -20,34 +23,34 @@ public class CurrentWeather {
         return mIcon;
     }
 
-    public int getIconId(){
+    public int getIconId() {
         int iconId = R.drawable.clear_day;
-        switch (getIcon()){
-            case "clear_day" :
+        switch (getIcon()) {
+            case "clear_day":
                 iconId = R.drawable.clear_day;
                 break;
-            case "rain" :
+            case "rain":
                 iconId = R.drawable.rain;
                 break;
-            case "snow" :
+            case "snow":
                 iconId = R.drawable.snow;
                 break;
-            case "sleet" :
+            case "sleet":
                 iconId = R.drawable.sleet;
                 break;
-            case "wind" :
+            case "wind":
                 iconId = R.drawable.wind;
                 break;
-            case "fog" :
+            case "fog":
                 iconId = R.drawable.fog;
                 break;
-            case "cloudy" :
+            case "cloudy":
                 iconId = R.drawable.cloudy;
                 break;
-            case "partly-cloudy-day" :
+            case "partly-cloudy-day":
                 iconId = R.drawable.partly_cloudy;
                 break;
-            case "partly-clody-night" :
+            case "partly-clody-night":
                 iconId = R.drawable.cloudy_night;
                 break;
             default:
@@ -64,10 +67,10 @@ public class CurrentWeather {
         return mTime;
     }
 
-    public String getFormattedTime(){
+    public String getFormattedTime() {
         SimpleDateFormat formatter = new SimpleDateFormat("h:mm a");
         formatter.setTimeZone(TimeZone.getTimeZone(getTimeZone()));
-        String timeString = formatter.format(new Date(getTime()*1000));
+        String timeString = formatter.format(new Date(getTime() * 1000));
 
         return timeString;
     }
@@ -78,6 +81,17 @@ public class CurrentWeather {
 
     public double getTemperature() {
         return mTemperature;
+    }
+
+    public int getTemperature(int param) {
+        switch (param) {
+            case CELSIUS:
+                return (int)Math.round((mTemperature - 32) * 5 / 9);
+            case FAHRENHEIT:
+                return (int)Math.round(mTemperature);
+            default:
+                return (int)Math.round(mTemperature);
+        }
     }
 
     public void setTemperature(double temperature) {
@@ -92,8 +106,8 @@ public class CurrentWeather {
         mHumidity = humidity;
     }
 
-    public double getPrecipChance() {
-        return mPrecipChance;
+    public int getPrecipChance() {
+        return (int)Math.round(mPrecipChance*100);
     }
 
     public void setPrecipChance(double precipChance) {

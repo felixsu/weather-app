@@ -1,12 +1,16 @@
 package felix.com.weatherapp;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.okhttp.Call;
@@ -17,8 +21,13 @@ import com.squareup.okhttp.Response;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.IOException;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 
 public class MainActivity extends AppCompatActivity {
     private static String TAG = MainActivity.class.getSimpleName();
@@ -27,43 +36,123 @@ public class MainActivity extends AppCompatActivity {
 
     private CurrentWeather mCurrentWeather;
 
+    @Bind(R.id.temperatureLabel)
+    TextView mTemperatureLabel;
+
+    @Bind(R.id.iconImageView)
+    ImageView mIconImageView;
+
+    @Bind(R.id.precipValue)
+    TextView mPrecipValue;
+
+    @Bind(R.id.humidityValue)
+    TextView mHumidityValue;
+
+    @Bind(R.id.timeLabel)
+    TextView mTimeLabel;
+
+    @Bind(R.id.summaryLabel)
+    TextView mSummaryLabel;
+
+    @Bind(R.id.refreshImageView)
+    ImageView mRefreshImageView;
+
+    @Bind(R.id.progressBar)
+    ProgressBar mProgressBar;
+
+    @Bind(R.id.locationLabel)
+    TextView mLocationLabel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        ButterKnife.bind(this);
 
+        mProgressBar.setVisibility(View.INVISIBLE);
+
+        getForecast(mLatitude, mLongitude);
+
+        mRefreshImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getForecast(mLatitude, mLongitude);
+            }
+        });
+    }
+
+    private void getForecast(double latitude, double longitude) {
         if (isNetworkAvailable()) {
+            toggleRefresh();
             OkHttpClient client = new OkHttpClient();
             Request request = new Request.Builder().
-                    url(buildUrl(mLatitude, mLongitude)).
+                    url(buildUrl(latitude, longitude)).
                     build();
             Call call = client.newCall(request);
             call.enqueue(new Callback() {
                 @Override
                 public void onFailure(Request request, IOException e) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            toggleRefresh();
+                        }
+                    });
                     alertUserAboutError();
                 }
 
                 @Override
                 public void onResponse(Response response) throws IOException {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            toggleRefresh();
+                        }
+                    });
                     try {
                         String jsonData = response.body().string();
                         Log.v(TAG, response.body().string());
                         if (response.isSuccessful()) {
                             mCurrentWeather = getCurrentDetails(jsonData);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    updateDisplay();
+                                }
+                            });
                         } else {
                             alertUserAboutError();
                         }
                     } catch (IOException | JSONException e) {
-                        Log.e(TAG, "Excepption caught", e);
+                        Log.e(TAG, "Exception caught", e);
                     }
                 }
             });
         } else {
             Toast.makeText(this, "Network not available", Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void toggleRefresh() {
+        if (mProgressBar.getVisibility() == View.INVISIBLE) {
+            mProgressBar.setVisibility(View.VISIBLE);
+            mRefreshImageView.setVisibility(View.INVISIBLE);
+        }else{
+            mProgressBar.setVisibility(View.INVISIBLE);
+            mRefreshImageView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void updateDisplay() {
+        mTemperatureLabel.setText(String.valueOf(mCurrentWeather.getTemperature(CurrentWeather.CELSIUS)));
+        mTimeLabel.setText("at " + mCurrentWeather.getFormattedTime() + " it will be");
+        mHumidityValue.setText(String.valueOf(mCurrentWeather.getHumidity()));
+        mPrecipValue.setText(String.valueOf(mCurrentWeather.getPrecipChance()) + "%");
+        mSummaryLabel.setText(mCurrentWeather.getSummary());
+        Drawable drawable = getDrawable(mCurrentWeather.getIconId());
+        mIconImageView.setImageDrawable(drawable);
+        mLocationLabel.setText("Jakarta, ID");
+
     }
 
     private CurrentWeather getCurrentDetails(String jsonData) throws JSONException {
