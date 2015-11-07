@@ -1,14 +1,16 @@
 package felix.com.weatherapp.weather;
 
+import felix.com.weatherapp.Constant;
+
 /**
  * Created by fsoewito on 11/7/2015.
  */
 public class DailyForecast {
     private long mTime;
     private String mSummary;
-    private double mTemperature;
+    private double mMinTemperature;
+    private double mMaxTemperature;
     private String mIcon;
-    private String mTImeZone;
 
     public long getTime() {
         return mTime;
@@ -26,12 +28,24 @@ public class DailyForecast {
         mSummary = summary;
     }
 
-    public double getTemperature() {
-        return mTemperature;
+    public double getMinTemperature() {
+        return mMinTemperature;
     }
 
-    public void setTemperature(double temperature) {
-        mTemperature = temperature;
+    public int getMinTemperature(int param) {
+        switch (param) {
+            case Constant.CELSIUS:
+                return (int)Math.round((mMinTemperature - 32) * 5 / 9);
+            case Constant.FAHRENHEIT:
+                return (int)Math.round(mMinTemperature);
+            default:
+                return (int)Math.round(mMinTemperature);
+        }
+    }
+
+
+    public void setMinTemperature(double minTemperature) {
+        mMinTemperature = minTemperature;
     }
 
     public String getIcon() {
@@ -42,11 +56,22 @@ public class DailyForecast {
         mIcon = icon;
     }
 
-    public String getTImeZone() {
-        return mTImeZone;
+    public double getMaxTemperature() {
+        return mMaxTemperature;
     }
 
-    public void setTImeZone(String TImeZone) {
-        mTImeZone = TImeZone;
+    public int getMaxTemperature(int param){
+        switch (param) {
+            case Constant.CELSIUS:
+                return (int)Math.round((mMaxTemperature - 32) * 5 / 9);
+            case Constant.FAHRENHEIT:
+                return (int)Math.round(mMaxTemperature);
+            default:
+                return (int)Math.round(mMaxTemperature);
+        }
+    }
+
+    public void setMaxTemperature(double maxTemperature) {
+        mMaxTemperature = maxTemperature;
     }
 }

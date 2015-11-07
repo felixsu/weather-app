@@ -1,6 +1,7 @@
 package felix.com.weatherapp.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -19,6 +21,7 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -26,8 +29,13 @@ import java.io.IOException;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
+import felix.com.weatherapp.Constant;
 import felix.com.weatherapp.R;
 import felix.com.weatherapp.weather.Current;
+import felix.com.weatherapp.weather.DailyForecast;
+import felix.com.weatherapp.weather.Forecast;
+import felix.com.weatherapp.weather.HourlyForecast;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -35,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
     double mLatitude = -6.215117;
     double mLongitude = 106.824896;
 
-    private Current mCurrent;
+    private Forecast mForecast;
 
     @Bind(R.id.temperatureLabel)
     TextView mTemperatureLabel;
@@ -114,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
                         String jsonData = response.body().string();
                         Log.v(TAG, response.body().string());
                         if (response.isSuccessful()) {
-                            mCurrent = getCurrentDetails(jsonData);
+                            mForecast = parseForecastDetails(jsonData);
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -138,27 +146,80 @@ public class MainActivity extends AppCompatActivity {
         if (mProgressBar.getVisibility() == View.INVISIBLE) {
             mProgressBar.setVisibility(View.VISIBLE);
             mRefreshImageView.setVisibility(View.INVISIBLE);
-        }else{
+        } else {
             mProgressBar.setVisibility(View.INVISIBLE);
             mRefreshImageView.setVisibility(View.VISIBLE);
         }
     }
 
     private void updateDisplay() {
-        mTemperatureLabel.setText(String.valueOf(mCurrent.getTemperature(Current.CELSIUS)));
-        mTimeLabel.setText("at " + mCurrent.getFormattedTime() + " it will be");
-        mHumidityValue.setText(String.valueOf(mCurrent.getHumidity()));
-        mPrecipValue.setText(String.valueOf(mCurrent.getPrecipChance()) + "%");
-        mSummaryLabel.setText(mCurrent.getSummary());
-        Drawable drawable = getDrawable(mCurrent.getIconId());
+        Current current = mForecast.getCurrent();
+
+        mTemperatureLabel.setText(String.valueOf(current.getTemperature(Constant.CELSIUS)));
+        mTimeLabel.setText("at " + current.getFormattedTime() + " it will be");
+        mHumidityValue.setText(String.valueOf(current.getHumidity()));
+        mPrecipValue.setText(String.valueOf(current.getPrecipChance()) + "%");
+        mSummaryLabel.setText(current.getSummary());
+        Drawable drawable = getDrawable(current.getIconId());
         mIconImageView.setImageDrawable(drawable);
         mLocationLabel.setText("Jakarta, ID");
 
     }
 
+    private Forecast parseForecastDetails(String jsonData) throws JSONException {
+        Forecast forecast = new Forecast();
+        forecast.setCurrent(getCurrentDetails(jsonData));
+        forecast.setDailyForecast(getDailyDetails(jsonData));
+        forecast.setHourlyForecast(getHourlyDetails(jsonData));
+        return forecast;
+    }
+
+    private DailyForecast[] getDailyDetails(String jsonData) throws JSONException {
+        JSONObject jsonForecast = new JSONObject(jsonData);
+        JSONObject jsonDaily = jsonForecast.getJSONObject("daily");
+        JSONArray jsonDailyData = jsonDaily.getJSONArray("data");
+
+        DailyForecast[] dailyForecasts = new DailyForecast[jsonDailyData.length()];
+        for (int i = 0; i < dailyForecasts.length; i++) {
+            JSONObject jsonDailyObject = jsonDailyData.getJSONObject(i);
+
+            DailyForecast daily = new DailyForecast();
+            daily.setIcon(jsonDailyObject.getString("icon"));
+            daily.setSummary(jsonDailyObject.getString("summary"));
+            daily.setTime(jsonDailyObject.getLong("time"));
+            daily.setMinTemperature(jsonDailyObject.getDouble("temperatureMin"));
+            daily.setMaxTemperature(jsonDailyObject.getDouble("temperatureMax"));
+
+            dailyForecasts[i] = daily;
+        }
+        Log.i(TAG, "dailyForecast created successfully");
+        return dailyForecasts;
+    }
+
+    private HourlyForecast[] getHourlyDetails(String jsonData) throws JSONException {
+        JSONObject jsonForecast = new JSONObject(jsonData);
+        JSONObject jsonHourly = jsonForecast.getJSONObject("hourly");
+        JSONArray jsonHourlyData = jsonHourly.getJSONArray("data");
+        HourlyForecast[] hourlyForecasts = new HourlyForecast[jsonHourlyData.length()];
+
+        for (int i = 0; i < hourlyForecasts.length; i++){
+            JSONObject jsonHourlyObject = jsonHourlyData.getJSONObject(i);
+
+            HourlyForecast hourly = new HourlyForecast();
+            hourly.setIcon(jsonHourlyObject.getString("icon"));
+            hourly.setSummary(jsonHourlyObject.getString("summary"));
+            hourly.setTime(jsonHourlyObject.getLong("time"));
+            hourly.setTemperature(jsonHourlyObject.getDouble("temperature"));
+
+            hourlyForecasts[i] = hourly;
+        }
+        Log.i(TAG, "hourlyForecast created successfully");
+        return hourlyForecasts;
+    }
+
     private Current getCurrentDetails(String jsonData) throws JSONException {
         JSONObject forecast = new JSONObject(jsonData);
-        String timzeone = forecast.getString("timezone");
+        String timeZone = forecast.getString("timezone");
 
         JSONObject currently = forecast.getJSONObject("currently");
         Current current = new Current();
@@ -167,9 +228,9 @@ public class MainActivity extends AppCompatActivity {
         current.setIcon(currently.getString("icon"));
         current.setPrecipChance(currently.getDouble("precipProbability"));
         current.setTemperature(currently.getDouble("temperature"));
-        current.setTimeZone(timzeone);
+        current.setTimeZone(timeZone);
 
-        Log.i(TAG, "From JSON " + current.getFormattedTime());
+        Log.i(TAG, "current forecast created successfully");
         return current;
     }
 
@@ -192,8 +253,14 @@ public class MainActivity extends AppCompatActivity {
     private String buildUrl(double latitude, double longitude) {
         String url = "https://api.forecast.io/forecast";
         String apiKey = "5c150722b10107dcbd3b1c60931cacc9";
-        StringBuilder result = new StringBuilder();
-        return result.append(url).append("/").append(apiKey).append("/").append(latitude).append(",").append(longitude).toString();
+        return url + "/" + apiKey + "/" + latitude + "," + longitude;
     }
+
+    @OnClick(R.id.dailyButton)
+    public void startDailyActivity(View view){
+        Intent intent = new Intent(this, DailyForecastActivity.class);
+        startActivity(intent);
+    }
+
 
 }

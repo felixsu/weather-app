@@ -10,4 +10,6 @@
     <string name="summary_label">getting weather...</string>
     <string name="describer_icon">current weather</string>
     <string name="describer_degree">degree icon</string>
+    <string name="title_activity_daily">DailyActivity</string>
+    <string name="no_data">There\'s no data to display</string>
 </resources>

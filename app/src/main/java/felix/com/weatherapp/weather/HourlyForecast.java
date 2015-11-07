@@ -1,5 +1,7 @@
 package felix.com.weatherapp.weather;
 
+import felix.com.weatherapp.Constant;
+
 /**
  * Created by fsoewito on 11/7/2015.
  */
@@ -7,7 +9,6 @@ public class HourlyForecast {
     private long mTime;
     private String mSummary;
     private double mTemperature;
-    private String mTimeZone;
     private String mIcon;
 
     public long getTime() {
@@ -30,16 +31,19 @@ public class HourlyForecast {
         return mTemperature;
     }
 
+    public int getTemperature(int param){
+        switch (param) {
+            case Constant.CELSIUS:
+                return (int)Math.round((mTemperature - 32) * 5 / 9);
+            case Constant.FAHRENHEIT:
+                return (int)Math.round(mTemperature);
+            default:
+                return (int)Math.round(mTemperature);
+        }
+    }
+
     public void setTemperature(double temperature) {
         mTemperature = temperature;
-    }
-
-    public String getTimeZone() {
-        return mTimeZone;
-    }
-
-    public void setTimeZone(String timeZone) {
-        mTimeZone = timeZone;
     }
 
     public String getIcon() {

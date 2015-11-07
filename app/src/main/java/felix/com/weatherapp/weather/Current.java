@@ -4,14 +4,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+import felix.com.weatherapp.Constant;
 import felix.com.weatherapp.R;
 
 /**
  * Created by fsoewito on 11/6/2015.
  */
 public class Current {
-    public static final int CELSIUS = 0;
-    public static final int FAHRENHEIT = 1;
+
 
     private String mIcon;
     private long mTime;
@@ -87,9 +87,9 @@ public class Current {
 
     public int getTemperature(int param) {
         switch (param) {
-            case CELSIUS:
+            case Constant.CELSIUS:
                 return (int)Math.round((mTemperature - 32) * 5 / 9);
-            case FAHRENHEIT:
+            case Constant.FAHRENHEIT:
                 return (int)Math.round(mTemperature);
             default:
                 return (int)Math.round(mTemperature);
