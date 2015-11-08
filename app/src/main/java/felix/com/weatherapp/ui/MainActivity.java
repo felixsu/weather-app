@@ -159,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
         mHumidityValue.setText(String.valueOf(current.getHumidity()));
         mPrecipValue.setText(String.valueOf(current.getPrecipChance()) + "%");
         mSummaryLabel.setText(current.getSummary());
-        Drawable drawable = getDrawable(current.getIconId());
+        Drawable drawable = getDrawable(Forecast.getIconId(current.getIcon()));
         mIconImageView.setImageDrawable(drawable);
         mLocationLabel.setText("Jakarta, ID");
 
@@ -178,6 +178,7 @@ public class MainActivity extends AppCompatActivity {
         JSONObject jsonDaily = jsonForecast.getJSONObject("daily");
         JSONArray jsonDailyData = jsonDaily.getJSONArray("data");
 
+        String timeZone = jsonForecast.getString("timezone");
         DailyForecast[] dailyForecasts = new DailyForecast[jsonDailyData.length()];
         for (int i = 0; i < dailyForecasts.length; i++) {
             JSONObject jsonDailyObject = jsonDailyData.getJSONObject(i);
@@ -188,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
             daily.setTime(jsonDailyObject.getLong("time"));
             daily.setMinTemperature(jsonDailyObject.getDouble("temperatureMin"));
             daily.setMaxTemperature(jsonDailyObject.getDouble("temperatureMax"));
-
+            daily.setTimeZone(timeZone);
             dailyForecasts[i] = daily;
         }
         Log.i(TAG, "dailyForecast created successfully");
@@ -199,6 +200,8 @@ public class MainActivity extends AppCompatActivity {
         JSONObject jsonForecast = new JSONObject(jsonData);
         JSONObject jsonHourly = jsonForecast.getJSONObject("hourly");
         JSONArray jsonHourlyData = jsonHourly.getJSONArray("data");
+
+        String timeZone = jsonForecast.getString("timezone");
         HourlyForecast[] hourlyForecasts = new HourlyForecast[jsonHourlyData.length()];
 
         for (int i = 0; i < hourlyForecasts.length; i++){
@@ -209,6 +212,7 @@ public class MainActivity extends AppCompatActivity {
             hourly.setSummary(jsonHourlyObject.getString("summary"));
             hourly.setTime(jsonHourlyObject.getLong("time"));
             hourly.setTemperature(jsonHourlyObject.getDouble("temperature"));
+            hourly.setTimeZone(timeZone);
 
             hourlyForecasts[i] = hourly;
         }
@@ -258,6 +262,7 @@ public class MainActivity extends AppCompatActivity {
     @OnClick(R.id.dailyButton)
     public void startDailyActivity(View view){
         Intent intent = new Intent(this, DailyForecastActivity.class);
+        intent.putExtra(getString(R.string.key_daily), mForecast.getDailyForecast());
         startActivity(intent);
     }
 

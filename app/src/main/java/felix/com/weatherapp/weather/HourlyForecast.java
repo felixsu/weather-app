@@ -10,6 +10,15 @@ public class HourlyForecast {
     private String mSummary;
     private double mTemperature;
     private String mIcon;
+    private String mTimeZone;
+
+    public String getTimeZone() {
+        return mTimeZone;
+    }
+
+    public void setTimeZone(String timeZone) {
+        mTimeZone = timeZone;
+    }
 
     public long getTime() {
         return mTime;
@@ -31,14 +40,14 @@ public class HourlyForecast {
         return mTemperature;
     }
 
-    public int getTemperature(int param){
+    public int getTemperature(int param) {
         switch (param) {
             case Constant.CELSIUS:
-                return (int)Math.round((mTemperature - 32) * 5 / 9);
+                return (int) Math.round((mTemperature - 32) * 5 / 9);
             case Constant.FAHRENHEIT:
-                return (int)Math.round(mTemperature);
+                return (int) Math.round(mTemperature);
             default:
-                return (int)Math.round(mTemperature);
+                return (int) Math.round(mTemperature);
         }
     }
 

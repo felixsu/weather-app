@@ -1,16 +1,37 @@
 package felix.com.weatherapp.weather;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
+
 import felix.com.weatherapp.Constant;
 
 /**
  * Created by fsoewito on 11/7/2015.
  */
-public class DailyForecast {
+public class DailyForecast implements Parcelable{
     private long mTime;
     private String mSummary;
     private double mMinTemperature;
     private double mMaxTemperature;
     private String mIcon;
+
+
+    public DailyForecast() {
+    }
+
+    public String getTimeZone() {
+        return mTimeZone;
+    }
+
+    public void setTimeZone(String timeZone) {
+        mTimeZone = timeZone;
+    }
+
+    private String mTimeZone;
 
     public long getTime() {
         return mTime;
@@ -74,4 +95,44 @@ public class DailyForecast {
     public void setMaxTemperature(double maxTemperature) {
         mMaxTemperature = maxTemperature;
     }
+
+    public String getDayOfTheWeek() {
+        SimpleDateFormat formatter = new SimpleDateFormat("EEEE");
+        formatter.setTimeZone(TimeZone.getTimeZone(getTimeZone()));
+        return formatter.format(new Date(getTime()*1000));
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(getTime());
+        dest.writeString(getSummary());
+        dest.writeDouble(getMaxTemperature());
+        dest.writeString(getIcon());
+        dest.writeString(getTimeZone());
+    }
+
+    private DailyForecast(Parcel parcel){
+        mTime = parcel.readLong();
+        mSummary = parcel.readString();
+        mMaxTemperature = parcel.readDouble();
+        mIcon = parcel.readString();
+        mTimeZone = parcel.readString();
+    }
+
+    public static final Creator<DailyForecast> CREATOR = new Creator<DailyForecast>() {
+        @Override
+        public DailyForecast createFromParcel(Parcel source) {
+            return new DailyForecast(source);
+        }
+
+        @Override
+        public DailyForecast[] newArray(int size) {
+            return new DailyForecast[size];
+        }
+    };
 }
