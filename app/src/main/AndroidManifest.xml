@@ -23,7 +23,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.DailyForecastActivity"
+            android:name=".ui.HourlyForecastActivity"
             android:label="@string/title_activity_daily"
             android:parentActivityName=".ui.MainActivity"
             android:theme="@style/AppTheme" >
