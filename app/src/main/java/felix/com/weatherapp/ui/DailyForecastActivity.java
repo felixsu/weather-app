@@ -6,12 +6,12 @@ import android.widget.ArrayAdapter;
 
 import felix.com.weatherapp.R;
 
-public class HourlyForecastActivity extends ListActivity {
+public class DailyForecastActivity extends ListActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_hourly);
+        setContentView(R.layout.activity_daily);
 
         String[] days = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,

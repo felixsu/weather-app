@@ -257,7 +257,7 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.dailyButton)
     public void startDailyActivity(View view){
-        Intent intent = new Intent(this, HourlyForecastActivity.class);
+        Intent intent = new Intent(this, DailyForecastActivity.class);
         startActivity(intent);
     }
 
