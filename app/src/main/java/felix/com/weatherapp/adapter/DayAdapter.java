@@ -50,7 +50,9 @@ public class DayAdapter extends BaseAdapter {
             convertView = LayoutInflater.from(mContext).inflate(R.layout.daily_list_item, null);
             holder = new ViewHolder();
             holder.setIconImageView((ImageView) convertView.findViewById(R.id.iconImageView));
-            holder.setTemperatureLabel((TextView) convertView.findViewById(R.id.temperatureLabel));
+            holder.setTemperatureMinLabel((TextView) convertView.findViewById(R.id.temperatureMinLabel));
+            holder.setTemperatureMaxLabel((TextView) convertView.findViewById(R.id.temperatureMaxLabel));
+            holder.setSummaryLabel((TextView) convertView.findViewById(R.id.summaryLabel));
             holder.setDayLabel((TextView) convertView.findViewById(R.id.dayNameLabel));
 
             convertView.setTag(holder);
@@ -60,15 +62,22 @@ public class DayAdapter extends BaseAdapter {
 
         DailyForecast dailyForecast = mDailyForecasts[position];
         holder.getIconImageView().setImageResource(Forecast.getIconId(dailyForecast.getIcon()));
-        holder.getTemperatureLabel().setText(String.valueOf(dailyForecast.getMaxTemperature(Constant.CELSIUS)));
-        holder.getDayLabel().setText(dailyForecast.getDayOfTheWeek());
-
+        holder.getTemperatureMinLabel().setText(String.valueOf(dailyForecast.getMinTemperature(Constant.CELSIUS)));
+        holder.getTemperatureMaxLabel().setText(String.valueOf(dailyForecast.getMaxTemperature(Constant.CELSIUS)));
+        holder.getSummaryLabel().setText(dailyForecast.getSummary());
+        if (position == 0) {
+            holder.getDayLabel().setText("Today");
+        } else {
+            holder.getDayLabel().setText(dailyForecast.getDayOfTheWeek());
+        }
         return convertView;
     }
 
     private static class ViewHolder{
         ImageView iconImageView;
-        TextView temperatureLabel;
+        TextView temperatureMinLabel;
+        TextView temperatureMaxLabel;
+        TextView summaryLabel;
         TextView dayLabel;
 
         public ImageView getIconImageView() {
@@ -79,12 +88,12 @@ public class DayAdapter extends BaseAdapter {
             this.iconImageView = iconImageView;
         }
 
-        public TextView getTemperatureLabel() {
-            return temperatureLabel;
+        public TextView getTemperatureMinLabel() {
+            return temperatureMinLabel;
         }
 
-        public void setTemperatureLabel(TextView temperatureLabel) {
-            this.temperatureLabel = temperatureLabel;
+        public void setTemperatureMinLabel(TextView temperatureLabel) {
+            this.temperatureMinLabel = temperatureLabel;
         }
 
         public TextView getDayLabel() {
@@ -93,6 +102,22 @@ public class DayAdapter extends BaseAdapter {
 
         public void setDayLabel(TextView dayLabel) {
             this.dayLabel = dayLabel;
+        }
+
+        public TextView getTemperatureMaxLabel() {
+            return temperatureMaxLabel;
+        }
+
+        public void setTemperatureMaxLabel(TextView temperatureMaxLabel) {
+            this.temperatureMaxLabel = temperatureMaxLabel;
+        }
+
+        public TextView getSummaryLabel() {
+            return summaryLabel;
+        }
+
+        public void setSummaryLabel(TextView summaryLabel) {
+            this.summaryLabel = summaryLabel;
         }
     }
 }

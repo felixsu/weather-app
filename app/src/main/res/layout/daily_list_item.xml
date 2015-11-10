@@ -1,52 +1,116 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:orientation="vertical"
     android:layout_height="wrap_content"
     android:paddingBottom="4dp"
-    android:paddingLeft="64dp"
+    android:paddingLeft="32dp"
     android:paddingRight="32dp"
     android:paddingTop="4dp"
     tools:background="@color/colorPrimary">
 
-    <ImageView
-        android:id="@+id/circleImageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:src="@drawable/bg_temperature"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <ImageView
-        android:id="@+id/iconImageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_toEndOf="@+id/circleImageView"
-        android:paddingLeft="10dp"
-        android:src="@drawable/clear_night"/>
 
-    <TextView
-        android:id="@+id/dayNameLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_toEndOf="@+id/iconImageView"
-        android:paddingLeft="10dp"
-        android:textColor="@color/white"
-        android:textSize="20sp"
-        tools:text="Monday"/>
+        <ImageView
+            android:id="@+id/circleMinImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:src="@drawable/bg_temperature" />
 
-    <TextView
-        android:id="@+id/temperatureLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/circleImageView"
-        android:layout_alignLeft="@+id/circleImageView"
-        android:layout_alignRight="@+id/circleImageView"
-        android:layout_alignTop="@+id/circleImageView"
-        android:layout_centerVertical="true"
-        android:layout_toStartOf="@+id/iconImageView"
-        android:gravity="center"
-        tools:text="100"/>
-</RelativeLayout>
+        <ImageView
+            android:id="@+id/circleMaxImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/circleMinImageView"
+            android:paddingLeft="10dp"
+            android:src="@drawable/bg_temperature" />
+
+        <ImageView
+            android:id="@+id/iconImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@+id/circleMaxImageView"
+            android:paddingLeft="10dp"
+            android:src="@drawable/clear_night" />
+
+        <TextView
+            android:id="@+id/dayNameLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@+id/iconImageView"
+            android:paddingLeft="10dp"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            tools:text="Monday" />
+
+        <TextView
+            android:id="@+id/temperatureMinLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/circleMinImageView"
+            android:layout_alignLeft="@+id/circleMinImageView"
+            android:layout_alignRight="@+id/circleMinImageView"
+            android:layout_alignTop="@+id/circleMinImageView"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@+id/iconImageView"
+            android:gravity="center"
+            tools:text="100" />
+
+        <TextView
+            android:id="@+id/temperatureMaxLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/circleMaxImageView"
+            android:layout_alignLeft="@+id/circleMaxImageView"
+            android:layout_alignRight="@+id/circleMaxImageView"
+            android:layout_alignTop="@+id/circleMaxImageView"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@+id/iconImageView"
+            android:gravity="center"
+            tools:text="100"
+            android:paddingLeft="10dp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/maxLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Max"
+            android:textSize="12sp"
+            android:textColor="@color/white"
+            android:layout_toEndOf="@+id/minLabel"
+            android:paddingLeft="36dp" />
+
+        <TextView
+            android:id="@+id/minLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="12dp"
+            android:text="Min"
+            android:textSize="12sp"
+            android:textColor="@color/white" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/summaryLabel"
+            android:textSize="12sp"
+            android:textColor="@color/halfWhite"
+            android:paddingLeft="32dp"
+            android:layout_toRightOf="@id/maxLabel"
+            tools:text="clear sky" />
+    </RelativeLayout>
+
+
+</LinearLayout>
