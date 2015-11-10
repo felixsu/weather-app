@@ -44,7 +44,7 @@ public class HourlyForecast implements Parcelable {
 
     public String getHour() {
         TimeZone timeZone = TimeZone.getTimeZone(getTimeZone());
-        SimpleDateFormat formatter = new SimpleDateFormat("hh a");
+        SimpleDateFormat formatter = new SimpleDateFormat("h a");
         formatter.setTimeZone(timeZone);
 
         return formatter.format(new Date(mTime*1000));

@@ -1,5 +1,6 @@
 package felix.com.weatherapp.ui;
 
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;

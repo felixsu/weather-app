@@ -21,7 +21,8 @@
         android:gravity="center"
         android:text="This week's forecast"
         android:textColor="@color/white"
-        android:textSize="24sp" />
+        android:textSize="24sp"
+        android:translationZ="12dp" />
 
     <ListView
         android:id="@android:id/list"
@@ -29,10 +30,12 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/locationLabel"
         android:layout_below="@+id/welcomeLabel"
-        android:divider="@null"
-        android:dividerHeight="0dp"
+        android:divider="@color/fourthWhite"
+        android:dividerHeight="1dp"
         android:paddingBottom="16dp"
-        android:paddingTop="16dp" />
+        android:paddingTop="16dp"
+        android:scrollbarAlwaysDrawVerticalTrack="false"
+        android:smoothScrollbar="true" />
 
     <TextView
         android:id="@+id/locationLabel"
@@ -51,5 +54,6 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:text="@string/no_data" />
+        android:text="@string/no_data"
+        android:translationZ="12dp" />
 </RelativeLayout>
