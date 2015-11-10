@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="4dp"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                android:paddingTop="4dp"
+                tools:background="@color/colorPrimary">
+
+    <TextView
+        android:id="@+id/timeLabel"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerVertical="true"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        tools:text="24 PM"
+        />
+
+    <ImageView
+        android:id="@+id/iconImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toEndOf="@+id/timeLabel"
+        android:src="@drawable/partly_cloudy"/>
+
+    <TextView
+        android:id="@+id/temperatureLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        tools:text="24"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="Partly Cloudy"
+        android:id="@+id/summaryLabel"
+        android:textSize="16sp"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:layout_centerVertical="true"
+        android:textColor="@color/white"
+        android:layout_toLeftOf="@+id/temperatureLabel"
+        android:layout_toRightOf="@+id/iconImageView"/>
+</RelativeLayout>
