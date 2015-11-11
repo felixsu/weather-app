@@ -111,6 +111,7 @@ public class DailyForecast implements Parcelable{
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(getTime());
         dest.writeString(getSummary());
+        dest.writeDouble(getMinTemperature());
         dest.writeDouble(getMaxTemperature());
         dest.writeString(getIcon());
         dest.writeString(getTimeZone());
@@ -119,6 +120,7 @@ public class DailyForecast implements Parcelable{
     private DailyForecast(Parcel parcel){
         mTime = parcel.readLong();
         mSummary = parcel.readString();
+        mMinTemperature = parcel.readDouble();
         mMaxTemperature = parcel.readDouble();
         mIcon = parcel.readString();
         mTimeZone = parcel.readString();
