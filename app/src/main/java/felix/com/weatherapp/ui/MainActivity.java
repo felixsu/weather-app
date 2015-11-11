@@ -3,6 +3,7 @@ package felix.com.weatherapp.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -14,6 +15,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
@@ -37,12 +41,14 @@ import felix.com.weatherapp.weather.Forecast;
 import felix.com.weatherapp.weather.HourlyForecast;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     private static String TAG = MainActivity.class.getSimpleName();
     double mLatitude = -6.215117;
     double mLongitude = 106.824896;
 
     private Forecast mForecast;
+    private GoogleApiClient mGoogleApiClient;
+    private Location mLocation;
 
     @Bind(R.id.temperatureLabel)
     TextView mTemperatureLabel;
@@ -78,9 +84,10 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         mProgressBar.setVisibility(View.INVISIBLE);
-
+        buldGoogleApiClient();
+        Log.i(TAG, "old latitude " + String.valueOf(mLatitude));
+        Log.i(TAG, "old longitude " + String.valueOf(mLongitude));
         getForecast(mLatitude, mLongitude);
-
         mRefreshImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -204,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
         String timeZone = jsonForecast.getString("timezone");
         HourlyForecast[] hourlyForecasts = new HourlyForecast[jsonHourlyData.length()];
 
-        for (int i = 0; i < hourlyForecasts.length; i++){
+        for (int i = 0; i < hourlyForecasts.length; i++) {
             JSONObject jsonHourlyObject = jsonHourlyData.getJSONObject(i);
 
             HourlyForecast hourly = new HourlyForecast();
@@ -260,17 +267,45 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @OnClick(R.id.dailyButton)
-    public void startDailyActivity(View view){
+    public void startDailyActivity(View view) {
         Intent intent = new Intent(this, DailyForecastActivity.class);
         intent.putExtra(getString(R.string.key_daily), mForecast.getDailyForecast());
         startActivity(intent);
     }
 
     @OnClick(R.id.hourlyButton)
-    public void startHourlyActivity(View view){
+    public void startHourlyActivity(View view) {
         Intent intent = new Intent(this, HourlyForecastActivity.class);
         intent.putExtra(getString(R.string.key_hourly), mForecast.getHourlyForecast());
         startActivity(intent);
     }
 
+    protected synchronized void buldGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        if (mLocation != null) {
+            mLatitude = mLocation.getLatitude();
+            mLongitude = mLocation.getLongitude();
+            Log.i(TAG, "new latitude " + String.valueOf(mLatitude));
+            Log.i(TAG, "new longitude " + String.valueOf(mLongitude));
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }
 }
