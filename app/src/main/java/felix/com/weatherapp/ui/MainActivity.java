@@ -3,6 +3,8 @@ package felix.com.weatherapp.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -16,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.squareup.okhttp.Call;
@@ -29,6 +32,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -41,10 +46,17 @@ import felix.com.weatherapp.weather.Forecast;
 import felix.com.weatherapp.weather.HourlyForecast;
 
 
-public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class MainActivity extends AppCompatActivity
+        implements GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener {
+
     private static String TAG = MainActivity.class.getSimpleName();
+    private static int REQUEST_CODE_RECOVER_PLAY_SERVICES = 200;
+
     double mLatitude = -6.215117;
     double mLongitude = 106.824896;
+    String mCity = "";
+    String mCountry = "";
 
     private Forecast mForecast;
     private GoogleApiClient mGoogleApiClient;
@@ -58,10 +70,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Bind(R.id.precipValue)
     TextView mPrecipValue;
-
     @Bind(R.id.humidityValue)
     TextView mHumidityValue;
-
     @Bind(R.id.timeLabel)
     TextView mTimeLabel;
 
@@ -84,10 +94,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         ButterKnife.bind(this);
 
         mProgressBar.setVisibility(View.INVISIBLE);
-        buldGoogleApiClient();
+
+        if (checkGooglePlayServices()) {
+            buildGoogleApiClient();
+        }
+
         Log.i(TAG, "old latitude " + String.valueOf(mLatitude));
         Log.i(TAG, "old longitude " + String.valueOf(mLongitude));
-        getForecast(mLatitude, mLongitude);
+
+
         mRefreshImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -162,13 +177,22 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         Current current = mForecast.getCurrent();
 
         mTemperatureLabel.setText(String.valueOf(current.getTemperature(Constant.CELSIUS)));
-        mTimeLabel.setText("at " + current.getFormattedTime() + " it will be");
+        mTimeLabel.setText(String.format(getString(R.string.mainTimeLabel), current.getFormattedTime()));
         mHumidityValue.setText(String.valueOf(current.getHumidity()));
-        mPrecipValue.setText(String.valueOf(current.getPrecipChance()) + "%");
+        mPrecipValue.setText(String.format(getString(R.string.mainPrecipLabel), String.valueOf(current.getPrecipChance())));
         mSummaryLabel.setText(current.getSummary());
         Drawable drawable = getDrawable(Forecast.getIconId(current.getIcon()));
         mIconImageView.setImageDrawable(drawable);
-        mLocationLabel.setText("Jakarta, ID");
+
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(mLatitude, mLongitude, 1);
+            mCountry = addresses.get(0).getCountryCode();
+            mCity = addresses.get(0).getLocality();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        mLocationLabel.setText(String.format("%s, %s", mCity, mCountry));
 
     }
 
@@ -268,19 +292,23 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @OnClick(R.id.dailyButton)
     public void startDailyActivity(View view) {
-        Intent intent = new Intent(this, DailyForecastActivity.class);
-        intent.putExtra(getString(R.string.key_daily), mForecast.getDailyForecast());
-        startActivity(intent);
+        if (mForecast != null) {
+            Intent intent = new Intent(this, DailyForecastActivity.class);
+            intent.putExtra(getString(R.string.key_daily), mForecast.getDailyForecast());
+            startActivity(intent);
+        }
     }
 
     @OnClick(R.id.hourlyButton)
     public void startHourlyActivity(View view) {
-        Intent intent = new Intent(this, HourlyForecastActivity.class);
-        intent.putExtra(getString(R.string.key_hourly), mForecast.getHourlyForecast());
-        startActivity(intent);
+        if (mForecast != null) {
+            Intent intent = new Intent(this, HourlyForecastActivity.class);
+            intent.putExtra(getString(R.string.key_hourly), mForecast.getHourlyForecast());
+            startActivity(intent);
+        }
     }
 
-    protected synchronized void buldGoogleApiClient() {
+    protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -296,6 +324,33 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             mLongitude = mLocation.getLongitude();
             Log.i(TAG, "new latitude " + String.valueOf(mLatitude));
             Log.i(TAG, "new longitude " + String.valueOf(mLongitude));
+            getForecast(mLatitude, mLongitude);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CODE_RECOVER_PLAY_SERVICES) {
+
+            if (resultCode == RESULT_OK) {
+                // Make sure the app is not already connected or attempting to connect
+                if (!mGoogleApiClient.isConnecting() &&
+                        !mGoogleApiClient.isConnected()) {
+                    mGoogleApiClient.connect();
+                }
+            } else if (resultCode == RESULT_CANCELED) {
+                Toast.makeText(this, "Google Play Services must be installed.",
+                        Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (mGoogleApiClient != null) {
+            mGoogleApiClient.connect();
         }
     }
 
@@ -307,5 +362,25 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
 
+    }
+
+    private boolean checkGooglePlayServices() {
+        int checkGooglePlayServices = GooglePlayServicesUtil
+                .isGooglePlayServicesAvailable(this);
+        if (checkGooglePlayServices != ConnectionResult.SUCCESS) {
+        /*
+        * Google Play Services is missing or update is required
+		*  return code could be
+		* SUCCESS,
+		* SERVICE_MISSING, SERVICE_VERSION_UPDATE_REQUIRED,
+		* SERVICE_DISABLED, SERVICE_INVALID.
+		*/
+            GooglePlayServicesUtil.getErrorDialog(checkGooglePlayServices,
+                    this, REQUEST_CODE_RECOVER_PLAY_SERVICES).show();
+
+            return false;
+        }
+
+        return true;
     }
 }

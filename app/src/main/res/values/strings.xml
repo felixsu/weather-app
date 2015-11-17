@@ -15,4 +15,6 @@
     <string name="key_daily">dailyKey</string>
     <string name="title_activity_hourly_forecast">Hourly</string>
     <string name="key_hourly">hourlyKey</string>
+    <string name="mainTimeLabel">at %s it will be</string>
+    <string name="mainPrecipLabel">%s %%</string>
 </resources>
